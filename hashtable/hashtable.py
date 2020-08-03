@@ -11,6 +11,7 @@ class HashTableEntry:
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
+# hash_data = [None] * MIN_CAPACITY
 
 class HashTable:
     """
@@ -22,6 +23,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.capacity = capacity
+        self.hash_data = [None for i in range(self.capacity)]
+        
 
 
     def get_num_slots(self):
@@ -35,6 +39,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # not sure about this ***********************
+        return len(self.hash_data)
+        
 
 
     def get_load_factor(self):
@@ -54,6 +61,15 @@ class HashTable:
         """
 
         # Your code here
+        # FNV_prime = 109951162811
+        # offset_basis = 14695981039346656037
+        
+        # hash = offset_basis
+        
+        # for char in key:
+        #     hash = hash * FNV_prime
+        #     hash = hash ^ ord(char)
+        # return hash
 
 
     def djb2(self, key):
@@ -63,6 +79,10 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
 
     def hash_index(self, key):
@@ -82,6 +102,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        self.hash_data[index] = value
 
 
     def delete(self, key):
@@ -93,6 +115,10 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        self.hash_data[index] = None
+        
+            
 
 
     def get(self, key):
@@ -104,6 +130,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        return self.hash_data[index]
+        
 
 
     def resize(self, new_capacity):
