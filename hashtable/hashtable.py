@@ -24,7 +24,8 @@ class HashTable:
     def __init__(self, capacity):
         # Your code here
         self.capacity = capacity
-        self.hash_data = [None for i in range(self.capacity)]
+        self.hash_data = [None] * (self.capacity)
+        self.entry = 0
         
 
 
@@ -51,6 +52,16 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # not sure about this ********************
+        load_factor = self.entry / self.capacity
+                       
+        if not self.resize:
+            if load_factor > 0.7:
+                self.resize(int(self.capacity * 2))
+            elif load_factor < 0.2 and self.capacity != MIN_CAPACITY:
+                self.resize(int(self.capacity / 2))
+                
+        return load_factor
 
 
     def fnv1(self, key):
@@ -79,10 +90,10 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
-        hash = 5381
+        hashed = 5381
         for c in key:
-            hash = (hash * 33) + ord(c)
-        return hash
+            hashed = (hashed * 33) + ord(c)
+        return hashed
 
 
     def hash_index(self, key):
@@ -103,7 +114,21 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        self.hash_data[index] = value
+        cur = self.hash_data[index]
+        
+        if cur:
+            while cur.next != None and cur.key != key:
+                cur = cur.next
+            if cur.key == key:
+                cur.value = value
+            else:
+                cur.next = HashTableEntry(key, value)
+                self.entry += 1
+            
+        else:
+            self.hash_data[index] = HashTableEntry(key, value)
+            self.entry += 1
+        
 
 
     def delete(self, key):
@@ -116,7 +141,19 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        self.hash_data[index] = None
+        cur = self.hash_data[index]
+        
+        if cur is None:
+            return
+        while cur:
+            if cur.key == key:
+                self.hash_data[index] = cur.next
+                self.entry -= 1
+            cur = cur.next
+            
+        return None
+        
+            
         
             
 
@@ -131,7 +168,17 @@ class HashTable:
         """
         # Your code here
         index = self.hash_index(key)
-        return self.hash_data[index]
+        
+        cur = self.hash_data[index]
+        
+        while cur:
+            if cur.key == key:
+                return cur.value
+            
+            cur = cur.next
+            
+        return None
+        
         
 
 
@@ -143,7 +190,22 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        new_table = HashTable(new_capacity)
+        
+        for i in self.hash_data:
+            if i != None and i.next == None:
+                new_table.put(i.key, i.value)
+            else:
+                cur_node = i
+                while cur_node != None:
+                    new_table.put(cur_node.key, cur_node.value)
+                    cur_node = cur_node.next
+                    
+        self.capacity = new_table.capacity
+        self.hash_data = new_table.hash_data
+        self.entry = new_table.entry
+        
+            
 
 
 if __name__ == "__main__":
